@@ -1,46 +1,104 @@
-<label>Original volume (mL)</label>
-<input type="text" id="og-vol"/>
-<br>
-<label>Original solution concentration (%)</label>
-<input type="text" id="og-conc"/>
-<br>
-<label>Desired volume (mL)</label>
-<input type="text" id="des-vol"/>
-<br>
-<label>Desired solution concentration (%)</label>
-<input type="text" id="des-conc"/>
-<br>
-<button type="button" id="calc">Calculate</button>
-<p id="result">Output</p>
+<!DOCTYPE html>
+<html lang="en">
 
-<script>
-	const calcBtn = document.getElementById("calc");
-
-	calcBtn.addEventListener("click", function() {
-		doCalc();
-	});
-
-	function doCalc(){
-		let ogVol = document.getElementById('og-vol').value;
-		let ogConc = document.getElementById('og-conc').value;
-		let desVol = document.getElementById('des-vol').value;
-		let desConc = document.getElementById('des-conc').value;
-
-		if (!isNaN(ogVol) && !isNaN(ogConc) && !isNaN(desVol) && !isNaN(desConc)) {
-			let volDiffFactor = ogVol / desVol;
-			let concDiffFactor = ogConc / desConc
-			let reqOgVol = ogVol / (concDiffFactor * volDiffFactor);
-			let reqAdd = desVol - reqOgVol;
-
-			if (ogVol < reqOgVol) {
-				document.getElementById('result').innerHTML = 'Error: Impossible.';
-			} else {
-				document.getElementById('result').innerHTML = 'Answer: Take ' + reqOgVol + 'mL of the original solution and add ' + reqAdd + 'mL to it.';
-			}
-		} else {
-			document.getElementById('result').innerHTML = 'Error: All values must be numbers.';
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Volume and Concentration Calculator</title>
+	<style>
+		/* Add some basic styling to make the layout better */
+		body {
+			font-family: Arial, sans-serif;
+			margin: 20px;
 		}
-	}
-</script>
 
+		label {
+			display: block;
+			margin-bottom: 10px;
+		}
 
+		input[type="text"] {
+			width: 200px;
+			height: 30px;
+			margin-bottom: 15px;
+			padding: 5px;
+			font-size: 16px;
+		}
+
+		button[type="button"] {
+			width: 100px;
+			height: 30px;
+			background-color: #4CAF50;
+			color: white;
+			border: none;
+			cursor: pointer;
+		}
+
+		button[type="button"]:hover {
+			background-color: #3e8e41;
+		}
+	</style>
+</head>
+
+<body>
+
+	<label>Original volume (mL)</label>
+	<input type="text" id="og-vol" placeholder="Enter original volume">
+	<br>
+	<label>Original solution concentration (%)</label>
+	<input type="text" id="og-conc" placeholder="Enter original concentration">
+	<br>
+	<label>Desired volume (mL)</label>
+	<input type="text" id="des-vol" placeholder="Enter desired volume">
+	<br>
+	<label>Desired solution concentration (%)</label>
+	<input type="text" id="des-conc" placeholder="Enter desired concentration">
+	<br>
+	<button type="button" id="calc">Calculate</button>
+	<p id="result"></p>
+
+	<script>
+		const calcBtn = document.getElementById("calc");
+		const resultElement = document.getElementById("result");
+
+		// Function to perform the calculation
+		function doCalc() {
+			try {
+				let ogVol = parseFloat(document.getElementById('og-vol').value);
+				let ogConc = parseFloat(document.getElementById('og-conc').value);
+				let desVol = parseFloat(document.getElementById('des-vol').value);
+				let desConc = parseFloat(document.getElementById('des-conc').value);
+
+				if (isNaN(ogVol) || isNaN(ogConc) || isNaN(desVol) || isNaN(desConc)) {
+					throw new Error("All values must be numbers");
+				}
+
+				let volDiffFactor = ogVol / desVol;
+				let concDiffFactor = ogConc / desConc;
+
+				if (volDiffFactor <= 0 || concDiffFactor <= 0) {
+					throw new Error("Volume or concentration cannot be zero or negative");
+				}
+
+				let reqOgVol = Math.round(ogVol / (concDiffFactor * volDiffFactor) * 100) / 100;
+				let reqAdd = desVol - reqOgVol;
+
+				if (reqAdd < 0) {
+					throw new Error('Desired concentration cannot be higher than original');
+				} else {
+					document.getElementById('result').innerHTML = `Answer: Take ${reqOgVol}mL of the original solution and add ${reqAdd}mL to it.`;
+				}
+			} catch (error) {
+				document.getElementById('result').innerHTML = `Error: ${error.message}`;
+			}
+		}
+
+		// Add event listener to calculate button
+		calcBtn.addEventListener("click", function () {
+			doCalc();
+		});
+	</script>
+
+</body>
+
+</html>

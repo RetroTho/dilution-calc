@@ -1,0 +1,46 @@
+<label>Original volume (mL)</label>
+<input type="text" id="og-vol"/>
+<br>
+<label>Original solution concentration (%)</label>
+<input type="text" id="og-conc"/>
+<br>
+<label>Desired volume (mL)</label>
+<input type="text" id="des-vol"/>
+<br>
+<label>Desired solution concentration (%)</label>
+<input type="text" id="des-conc"/>
+<br>
+<button type="button" id="calc">Calculate</button>
+<p id="result">Output</p>
+
+<script>
+	const calcBtn = document.getElementById("calc");
+
+	calcBtn.addEventListener("click", function() {
+		doCalc();
+	});
+
+	function doCalc(){
+		let ogVol = document.getElementById('og-vol').value;
+		let ogConc = document.getElementById('og-conc').value;
+		let desVol = document.getElementById('des-vol').value;
+		let desConc = document.getElementById('des-conc').value;
+
+		if (!isNaN(ogVol) && !isNaN(ogConc) && !isNaN(desVol) && !isNaN(desConc)) {
+			let volDiffFactor = ogVol / desVol;
+			let concDiffFactor = ogConc / desConc
+			let reqOgVol = ogVol / (concDiffFactor * volDiffFactor);
+			let reqAdd = desVol - reqOgVol;
+
+			if (ogVol < reqOgVol) {
+				document.getElementById('result').innerHTML = 'Error: Impossible.';
+			} else {
+				document.getElementById('result').innerHTML = 'Answer: Take ' + reqOgVol + 'mL of the original solution and add ' + reqAdd + 'mL to it.';
+			}
+		} else {
+			document.getElementById('result').innerHTML = 'Error: All values must be numbers.';
+		}
+	}
+</script>
+
+
